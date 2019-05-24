@@ -314,12 +314,12 @@ bool TGAImage::set(int x, int y, TGAColor c)
 
 int TGAImage::getWidth()
 {
-	return 0;
+	return width;
 }
 
 int TGAImage::getHeight()
 {
-	return 0;
+	return height;
 }
 
 unsigned char * TGAImage::raw()
