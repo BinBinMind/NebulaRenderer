@@ -289,12 +289,42 @@ bool TGAImage::unloadRleData(std::ofstream & out)
 
 bool TGAImage::flipHorizontally()
 {
-	return false;
+	if (data == nullptr) return false;
+
+	int half = width >> 1;
+	for (int i = 0; i < half; i++)
+	{
+		for (int j = 0; j < height; j++)
+		{
+			TGAColor c1 = get(i, j);
+			TGAColor c2 = get(width - 1 - i, j);
+			set(i, j, c2);
+			set(width - 1 - i, j, c1);
+		}
+	}
+
+	return true;
 }
 
 bool TGAImage::flipVertically()
 {
-	return false;
+	if (data == nullptr) return false;
+
+	unsigned long half = height >> 1;
+	int bytesInLine = width * bytespp;
+	unsigned char* line = new unsigned char[bytesInLine];
+	for (int i = 0; i < half; i++)
+	{
+		unsigned long line1 = i * bytesInLine;
+		unsigned long line2 = (height - 1 - i) * bytesInLine;
+
+		memmove(line, data + line1, bytesInLine);
+		memmove(data + line1, data + line2, bytesInLine);
+		memmove(data + line2, line, bytesInLine);
+	}
+	delete[] line;
+
+	return true;
 }
 
 bool TGAImage::scale(int w, int h)
@@ -304,12 +334,18 @@ bool TGAImage::scale(int w, int h)
 
 TGAColor TGAImage::get(int x, int y)
 {
-	return TGAColor();
+	if(data == nullptr || x < 0 || y < 0 || x > width || y > height)
+		return TGAColor();
+	return TGAColor(data + (x + y * width) * bytespp, bytespp);
 }
 
 bool TGAImage::set(int x, int y, TGAColor c)
 {
-	return false;
+	if( data == nullptr || x < 0 || y < 0|| x > width || y > height)
+		return false;
+
+	memcpy(data + (x + y * width)*bytespp, c.raw, bytespp);
+	return true;
 }
 
 int TGAImage::getWidth()
@@ -324,11 +360,13 @@ int TGAImage::getHeight()
 
 unsigned char * TGAImage::raw()
 {
-	return nullptr;
+	return data;
 }
 
 void TGAImage::clear()
 {
+	if (data != nullptr)
+		memset(data, 0, bytespp * width * height);
 }
 
 
