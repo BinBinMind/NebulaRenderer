@@ -12,14 +12,13 @@ typedef struct TGAHeader
 	char imageType;
 	short firstEntry;
 	short numEntries;
-	char perPixelBits;
+	char depth;
 	short xOrigin;
 	short yOrigin;
 	short imageWidth;
 	short imageHeight;
-	char depth;
+	char perPixelBits;
 	char descriptor;
-
 }TGAHeader;
 #pragma pack(pop)
 
